@@ -1,0 +1,2 @@
+# graylog-plugin-ldap
+
