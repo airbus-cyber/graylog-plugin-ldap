@@ -14,7 +14,7 @@
 	</parent>
 
 	<groupId>com.airbus-cyber-security.graylog</groupId>
-	<artifactId>graylog-plugin-glpi</artifactId>
+	<artifactId>graylog-plugin-ldap</artifactId>
 	<version>0.0.0</version>
 	<packaging>jar</packaging>
 
