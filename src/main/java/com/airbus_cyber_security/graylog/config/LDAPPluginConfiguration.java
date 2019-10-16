@@ -1,3 +1,7 @@
+/*
+ * Copyright © - Airbus Defense and Space (SAS)- All Rights Reserved 
+ * Airbus Defense and Space owns the copyright of this document. 
+ */
 package com.airbus_cyber_security.graylog.config;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
@@ -17,14 +21,26 @@ public abstract class LDAPPluginConfiguration {
 	@JsonProperty("password")
 	public abstract String password();
 
+	@JsonProperty("heap_size")
+	public abstract int heapSize();
+
+	@JsonProperty("ttl")
+	public abstract int ttl();
+
 	@JsonCreator
 	public static LDAPPluginConfiguration create(@JsonProperty("ldap_url") String ldapUrl,
-			@JsonProperty("user") String user, @JsonProperty("password") String password) {
-		return builder().ldapUrl(ldapUrl).user(user).password(password).build();
+			@JsonProperty("user") String user, @JsonProperty("password") String password,
+			@JsonProperty("heap_size") int heapSize, @JsonProperty("ttl") int ttl) {
+		if (heapSize <= 0)
+			heapSize = 100;
+		if (ttl <= 0) {
+			ttl = 60;
+		}
+		return builder().ldapUrl(ldapUrl).user(user).password(password).heapSize(heapSize).ttl(ttl).build();
 	}
 
 	public static LDAPPluginConfiguration createDefault() {
-		return builder().ldapUrl("").user("").password("").build();
+		return builder().ldapUrl("").user("").password("").heapSize(100).ttl(60).build();
 	}
 
 	public static Builder builder() {
@@ -40,6 +56,10 @@ public abstract class LDAPPluginConfiguration {
 		public abstract Builder user(String user);
 
 		public abstract Builder password(String password);
+
+		public abstract Builder heapSize(int heapSize);
+
+		public abstract Builder ttl(int ttl);
 
 		public abstract LDAPPluginConfiguration build();
 	}

@@ -1,12 +1,29 @@
+/*
+ * Copyright © - Airbus Defense and Space (SAS)- All Rights Reserved 
+ * Airbus Defense and Space owns the copyright of this document. 
+ */
 package com.airbus_cyber_security.graylog;
 
-public class Search {
+public class LDAPSearch {
 
 	private String ldapUrl;
 	private String dc;
 	private String user;
 	private String password;
 	private String filter;
+
+	public LDAPSearch() {
+		super();
+	}
+	
+	public LDAPSearch(String ldapUrl, String dc, String user, String password, String filter) {
+		super();
+		this.ldapUrl = ldapUrl;
+		this.dc = dc;
+		this.user = user;
+		this.password = password;
+		this.filter = filter;
+	}
 
 	public String getFilter() {
 		return filter;

@@ -1,3 +1,7 @@
+/*
+ * Copyright © - Airbus Defense and Space (SAS)- All Rights Reserved 
+ * Airbus Defense and Space owns the copyright of this document. 
+ */
 package com.airbus_cyber_security.graylog;
 
 import org.graylog2.plugin.PluginConfigBean;

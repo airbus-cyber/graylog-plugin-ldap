@@ -4,3 +4,6 @@
 /.settings/
 /node/
 /node_modules/
+/cache/
+/build/
+/yarn.lock
