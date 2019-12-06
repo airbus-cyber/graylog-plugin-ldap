@@ -32,19 +32,22 @@ public class LDAP extends AbstractFunction<String> {
 
 	public static final String NAME = "LDAP";
 	private static final String QUERY = "query";
-	private static final String TYPE = "type";
 
 	private ClusterConfigService clusterConfig;
 	private LDAPSearch search = new LDAPSearch();
 
 	private CacheManager cacheManager;
 
-	private final ParameterDescriptor<String, String> queryParam = ParameterDescriptor.string(QUERY)
-			.description("The field you want to submit into LDAP search.").build();
-	private final ParameterDescriptor<String, String> typeParam = ParameterDescriptor.string(TYPE)
-			.description(
-					"The category of the field you want to submit into LDAP search. Can be Computer, Software, ...")
-			.build();
+	private ParameterDescriptor<String, String> queryParam = ParameterDescriptor.string(QUERY)
+			.description("The query you want to submit into LDAP search.").build();
+
+	public LDAP(final ClusterConfigService clusterConfigService, LDAPSearch search, CacheManager cacheManager,
+				ParameterDescriptor<String, String> queryParam){
+		this.clusterConfig = clusterConfigService;
+		this.search = search;
+		this.cacheManager = cacheManager;
+		this.queryParam = queryParam;
+	}
 
 	@Inject
 	public LDAP(final ClusterConfigService clusterConfigService) {
@@ -64,7 +67,6 @@ public class LDAP extends AbstractFunction<String> {
 	@Override
 	public String evaluate(FunctionArgs functionArgs, EvaluationContext evaluationContext) {
 		String query = queryParam.required(functionArgs, evaluationContext);
-		String type = typeParam.required(functionArgs, evaluationContext);
 		String responseStr = "";
 		Map<String, String> response = new HashMap<>();
 		Cache<String, String> myCache = cacheManager.getCache("myCache", String.class, String.class);
@@ -79,22 +81,28 @@ public class LDAP extends AbstractFunction<String> {
 			log.info("LDAP: query {} is into cache with response {}", query, myCache.get(query));
 			return myCache.get(query);
 		} else {
-			log.info("LDAP: LDAP URL is {} with user {} and password {}", config.ldapUrl(), config.user(),
-					config.password());
+			log.info("LDAP: LDAP URL is {} with base {]}, user {} and password {}", config.ldapUrl(), config.dc(),
+					config.user(), config.password());
 			search.setLdapUrl(config.ldapUrl());
+			search.setDc(config.dc());
 			search.setUser(config.user());
 			search.setPassword(config.password());
-			log.info("LDAP: Searching into {} with query param: {}", type, query);
-			// TODO: Add ldapsearch call
-			response.put("1", "Login");
-			log.info("LDAP response: {}", response);
-			if (response.isEmpty()) {
-				log.warn("LDAP: no result");
-				return "LDAP=noResult";
+			log.info("LDAP: Searching with query param: {}", query);
+			try {
+				response = search.getSearch(query);
+				log.info("LDAP response: {}", response);
+				if (response.isEmpty()) {
+					log.warn("LDAP: no result");
+					return "LDAP=noResult";
+				}
+				responseStr = mapToString(response);
+				myCache.put(query, responseStr);
+			} catch (Exception e) {
+				log.error("An error occurred while LDAP search", e);
 			}
-			responseStr = mapToString(response);
-			myCache.put(query, responseStr);
-			return responseStr;
+			finally {
+				return responseStr;
+			}
 		}
 	}
 
@@ -115,7 +123,7 @@ public class LDAP extends AbstractFunction<String> {
 	@Override
 	public FunctionDescriptor<String> descriptor() {
 		return FunctionDescriptor.<String>builder().name(NAME)
-				.description("Returns Map of field return by the LDAP search").params(queryParam, typeParam)
+				.description("Returns Map of field return by the LDAP search").params(queryParam)
 				.returnType(String.class).build();
 	}
 }

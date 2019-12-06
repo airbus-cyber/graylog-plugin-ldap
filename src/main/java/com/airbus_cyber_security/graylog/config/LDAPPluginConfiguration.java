@@ -15,6 +15,9 @@ public abstract class LDAPPluginConfiguration {
 	@JsonProperty("ldap_url")
 	public abstract String ldapUrl();
 
+	@JsonProperty("dc")
+	public abstract String dc();
+
 	@JsonProperty("user")
 	public abstract String user();
 
@@ -29,14 +32,15 @@ public abstract class LDAPPluginConfiguration {
 
 	@JsonCreator
 	public static LDAPPluginConfiguration create(@JsonProperty("ldap_url") String ldapUrl,
-			@JsonProperty("user") String user, @JsonProperty("password") String password,
-			@JsonProperty("heap_size") int heapSize, @JsonProperty("ttl") int ttl) {
+		 	@JsonProperty("dc") String dc, @JsonProperty("user") String user,
+		 	@JsonProperty("password") String password, @JsonProperty("heap_size") int heapSize,
+		 	@JsonProperty("ttl") int ttl) {
 		if (heapSize <= 0)
 			heapSize = 100;
 		if (ttl <= 0) {
 			ttl = 60;
 		}
-		return builder().ldapUrl(ldapUrl).user(user).password(password).heapSize(heapSize).ttl(ttl).build();
+		return builder().ldapUrl(ldapUrl).dc(dc).user(user).password(password).heapSize(heapSize).ttl(ttl).build();
 	}
 
 	public static LDAPPluginConfiguration createDefault() {
@@ -52,6 +56,8 @@ public abstract class LDAPPluginConfiguration {
 	@AutoValue.Builder
 	public static abstract class Builder {
 		public abstract Builder ldapUrl(String ldapUrl);
+
+		public abstract Builder dc(String dc);
 
 		public abstract Builder user(String user);
 
