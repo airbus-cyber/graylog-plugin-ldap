@@ -81,8 +81,8 @@ public class LDAP extends AbstractFunction<String> {
 			log.info("LDAP: query {} is into cache with response {}", query, myCache.get(query));
 			return myCache.get(query);
 		} else {
-			log.info("LDAP: LDAP URL is {} with base {]}, user {} and password {}", config.ldapUrl(), config.dc(),
-					config.user(), config.password());
+			log.info("LDAP: LDAP URL is {} with base {}, user {} and password ****", config.ldapUrl(), config.dc(),
+					config.user());
 			search.setLdapUrl(config.ldapUrl());
 			search.setDc(config.dc());
 			search.setUser(config.user());

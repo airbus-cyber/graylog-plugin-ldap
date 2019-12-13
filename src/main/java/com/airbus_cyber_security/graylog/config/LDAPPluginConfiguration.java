@@ -44,7 +44,7 @@ public abstract class LDAPPluginConfiguration {
 	}
 
 	public static LDAPPluginConfiguration createDefault() {
-		return builder().ldapUrl("").user("").password("").heapSize(100).ttl(60).build();
+		return builder().ldapUrl("").dc("").user("").password("").heapSize(100).ttl(60).build();
 	}
 
 	public static Builder builder() {
