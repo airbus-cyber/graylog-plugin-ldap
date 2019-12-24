@@ -15,14 +15,11 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import javax.naming.NamingException;
-import javax.naming.directory.*;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
