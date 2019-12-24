@@ -1,6 +1,7 @@
 package com.airbus_cyber_security.graylog;
 
 import com.airbus_cyber_security.graylog.config.LDAPPluginConfiguration;
+import org.ehcache.Cache;
 import org.ehcache.CacheManager;
 import org.ehcache.config.builders.CacheConfigurationBuilder;
 import org.ehcache.config.builders.CacheManagerBuilder;
@@ -41,18 +42,18 @@ public class LDAPTest {
         clusterConfig = mock(ClusterConfigService.class);
         queryParam = mock(ParameterDescriptor.class);
 
-        //search = mock(LDAPSearch.class);
+        search = mock(LDAPSearch.class);
 
         cacheManager = CacheManagerBuilder.newCacheManagerBuilder()
                 .withCache("myCache", CacheConfigurationBuilder
                         .newCacheConfigurationBuilder(String.class, String.class, ResourcePoolsBuilder.heap(100))
                         .withExpiry(ExpiryPolicyBuilder.timeToLiveExpiration(Duration.ofSeconds(60))))
                 .build(true);
-        plugin = new LDAP(clusterConfig, new LDAPSearch(), cacheManager, queryParam);
+        plugin = new LDAP(clusterConfig, search, cacheManager, queryParam);
         functionArgs = mock(FunctionArgs.class);
         evaluationContext = mock(EvaluationContext.class);
-        config = new LDAPPluginConfigurationTest("ldap://127.0.0.1", "dc=airbus,dc=com",
-                "cn=admin,dc=airbus,dc=com", "admin");
+        config = new LDAPPluginConfigurationTest("ldap://ldap.fake.com", "dc=fake,dc=com",
+                "cn=mock,dc=fake,dc=com", "fake");
     }
 
     @After
@@ -60,45 +61,56 @@ public class LDAPTest {
     }
 
     @Test
-    public void evaluateWithLocalLDAPTest() throws Exception {
-        createTestUserInLDAP();
-        String responseQuery = "(&(objectClass=inetOrgPerson)(uid=jdoe1))";
+    public void evaluateNominalCase() throws Exception {
+        String responseQuery = "(&(objectClass=inetOrgPerson)(uid=mock))";
+        Map<String, String> response = new HashMap<>();
+        response.put("uid=", "mock");
+        response.put("givenName", "Mock");
+        response.put("sn", "Fake");
+        response.put("cn", "Mock-Fake");
         when(clusterConfig.get(LDAPPluginConfiguration.class)).thenReturn(config);
+
+        when(queryParam.required(functionArgs, evaluationContext)).thenReturn(responseQuery);
+        when(search.getSearch(responseQuery)).thenReturn(response);
+        String actual = plugin.evaluate(functionArgs, evaluationContext);
+        String expected = "givenName=Mock uid==mock sn=Fake cn=Mock-Fake";
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void evaluateCacheCase() throws Exception {
+        String responseQuery = "(&(objectClass=inetOrgPerson)(uid=mock))";
+        String expected = "givenName=Mock uid==mock sn=Fake cn=Mock-Fake";
+        String inCache = "givenName=Mock uid==mock sn=Fake cn=Mock-Fake";
+        when(clusterConfig.get(LDAPPluginConfiguration.class)).thenReturn(config);
+
+        Cache<String, String> myCache = cacheManager.getCache("myCache", String.class, String.class);
+        myCache.put(responseQuery, inCache);
+
         when(queryParam.required(functionArgs, evaluationContext)).thenReturn(responseQuery);
         String actual = plugin.evaluate(functionArgs, evaluationContext);
-        String expected = "uid=jdoe1 displayName=Jane-Doe givenName=Jane objectClass=top sn=Doe cn=Jane-Doe";
         assertEquals(expected, actual);
-        deleteTestUserInLDAP("uid=jdoe1," + config.dc());
     }
 
-    private void createTestUserInLDAP() throws NamingException {
-        //create new user's DN
-        String entryDN = "uid=jdoe1," + config.dc();
-        //create new user's attributes
-        Attribute cn = new BasicAttribute("cn", "Jane Doe");
-        Attribute sn = new BasicAttribute("sn", "Doe");
-        Attribute givenName = new BasicAttribute("givenName", "Jane");
-        Attribute displayName = new BasicAttribute("displayName", "Jane Doe");
-        Attribute oc = new BasicAttribute("objectClass");
-        oc.add("top");
-        oc.add("person");
-        oc.add("organizationalPerson");
-        oc.add("inetOrgPerson");
+    @Test
+    public void evaluateNoResultCase() throws Exception {
+        String responseQuery = "(&(objectClass=inetOrgPerson)(uid=mock))";
+        Map<String, String> response = new HashMap<>();
+        when(clusterConfig.get(LDAPPluginConfiguration.class)).thenReturn(config);
 
-        DirContext context = new InitialDirContext(LDAPUtils.getEnv(config.ldapUrl(), config.user(), config.password()));
-
-        BasicAttributes entry = new BasicAttributes();
-        entry.put(cn);
-        entry.put(sn);
-        entry.put(givenName);
-        entry.put(displayName);
-        entry.put(oc);
-
-        context.createSubcontext(entryDN, entry);
+        when(queryParam.required(functionArgs, evaluationContext)).thenReturn(responseQuery);
+        when(search.getSearch(responseQuery)).thenReturn(response);
+        String actual = plugin.evaluate(functionArgs, evaluationContext);
+        String expected = "";
+        assertEquals(expected, actual);
     }
 
-    private void deleteTestUserInLDAP(final String dn) throws NamingException {
-        DirContext context = new InitialDirContext(LDAPUtils.getEnv(config.ldapUrl(), config.user(), config.password()));
-        context.unbind(dn);
+    @Test
+    public void evaluateNoConfigCase() throws Exception {
+        String responseQuery = "(&(objectClass=inetOrgPerson)(uid=mock))";
+        String expected = "LDAP=noConfig";
+        when(queryParam.required(functionArgs, evaluationContext)).thenReturn(responseQuery);
+        String actual = plugin.evaluate(functionArgs, evaluationContext);
+        assertEquals(expected, actual);
     }
 }
