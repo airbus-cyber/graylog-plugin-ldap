@@ -10,6 +10,7 @@ import { BootstrapModalForm, Input } from 'components/bootstrap';
 import { IfPermitted } from 'components/common';
 import ObjectUtils from 'util/ObjectUtils';
 import UserNotification from 'util/UserNotification';
+import Bind from './Bind';
 
 const LDAPPluginConfiguration = createReactClass({
 	displayName: 'LDAPPluginConfiguration',
@@ -22,9 +23,10 @@ const LDAPPluginConfiguration = createReactClass({
 	getDefaultProps() {
 		return {
 			config: {
-				ldap_url: 'ldap://url:port',
-				user: 'user',
-				password: 'password',
+				ldap_url: 'ldap://127.0.0.1',
+				dc: 'dc=airbus,dc=com',
+				user: 'cn=admin,dc=airbus,dc=com',
+				password: 'admin',
 				heap_size: 100,
 				ttl: 60,
 			},
@@ -85,7 +87,21 @@ const LDAPPluginConfiguration = createReactClass({
 	},
 
 	_test_connection() {
-		UserNotification.error("TODO")
+		fetch('/ldapAuth/?ldap_url=' + this.state.config.ldap_url +
+            '&user=' + this.state.config.user + '&password=' + this.state.config.password)
+            .then((res) => {
+            if (res.ok) {
+                UserNotification.success("Connection to "
+                    + this.state.config.ldap_url + " with user "
+                    + this.state.config.user + " succeeded !");
+            } else {
+                UserNotification.error("Impossible to connect to "
+                    + this.state.config.ldap_url + " with user "
+                    + this.state.config.user + " Failed to connect");
+            }
+
+        }).then(data => { console.log(data) });
+
 	},
 
 	render() {
@@ -94,7 +110,7 @@ const LDAPPluginConfiguration = createReactClass({
 				<h3>LDAP Plugin Configuration</h3>
 
 				<p>
-					Base configuration LDAP plugin (URI, bind user and bind password).
+					Base configuration LDAP plugin (URI, baseDN, bind user and bind password).
 					Note that some parameters will be stored in MongoDB without encryption.
 					Graylog users with required permissions will be able to read them in the
 					configuration dialog on this page.
@@ -105,6 +121,13 @@ const LDAPPluginConfiguration = createReactClass({
 					<dd>
 						{this.state.config.ldap_url
 							? this.state.config.ldap_url
+							: '[not set]'}
+					</dd>
+
+					<dt>BaseDN:</dt>
+					<dd>
+						{this.state.config.dc
+							? this.state.config.dc
 							: '[not set]'}
 					</dd>
 
@@ -162,6 +185,19 @@ const LDAPPluginConfiguration = createReactClass({
 						/>
 
 						<Input
+							id="dc"
+							type="text"
+							label="LDAP baseDN"
+							help={
+								<span>Note that this will be stored in plaintext. Please consult the documentation for
+									suggested rights to assign to the underlying IAM user.</span>
+							}
+							name="dc"
+							value={this.state.config.dc}
+							onChange={this._onUpdate('dc')}
+						/>
+
+						<Input
 							id="user"
 							type="text"
 							label="LDAP bind user"
@@ -201,7 +237,7 @@ const LDAPPluginConfiguration = createReactClass({
 						/>
 
 						<Input
-							id="ttl"
+							id="ttl"q
 							type="number"
 							min="0"
 							label="Cache TTL (seconds)"
@@ -213,7 +249,6 @@ const LDAPPluginConfiguration = createReactClass({
 							onChange={this._onUpdate('ttl')}
 						/>
 
-						<Button bsStyle="info" bsSize="s" onClick={this._test_connection}>Test</Button>
 					</fieldset>
 				</BootstrapModalForm>
 			</div>

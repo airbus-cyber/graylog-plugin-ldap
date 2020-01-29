@@ -61,7 +61,7 @@ public class LDAPTest {
     public void evaluateNominalCase() throws Exception {
         String responseQuery = "(&(objectClass=inetOrgPerson)(uid=mock))";
         Map<String, String> response = new HashMap<>();
-        response.put("uid=", "mock");
+        response.put("uid", "mock");
         response.put("givenName", "Mock");
         response.put("sn", "Fake");
         response.put("cn", "Mock-Fake");
@@ -70,15 +70,15 @@ public class LDAPTest {
         when(queryParam.required(functionArgs, evaluationContext)).thenReturn(responseQuery);
         when(search.getSearch(responseQuery)).thenReturn(response);
         String actual = plugin.evaluate(functionArgs, evaluationContext);
-        String expected = "givenName=Mock uid==mock sn=Fake cn=Mock-Fake";
+        String expected = "uid=mock givenName=Mock sn=Fake cn=Mock-Fake";
         assertEquals(expected, actual);
     }
 
     @Test
     public void evaluateCacheCase() throws Exception {
         String responseQuery = "(&(objectClass=inetOrgPerson)(uid=mock))";
-        String expected = "givenName=Mock uid==mock sn=Fake cn=Mock-Fake";
-        String inCache = "givenName=Mock uid==mock sn=Fake cn=Mock-Fake";
+        String expected = "givenName=Mock uid=mock sn=Fake cn=Mock-Fake";
+        String inCache = "givenName=Mock uid=mock sn=Fake cn=Mock-Fake";
         when(clusterConfig.get(LDAPPluginConfiguration.class)).thenReturn(config);
 
         Cache<String, String> myCache = cacheManager.getCache("myCache", String.class, String.class);
@@ -98,7 +98,7 @@ public class LDAPTest {
         when(queryParam.required(functionArgs, evaluationContext)).thenReturn(responseQuery);
         when(search.getSearch(responseQuery)).thenReturn(response);
         String actual = plugin.evaluate(functionArgs, evaluationContext);
-        String expected = "";
+        String expected = "LDAP=noResult";
         assertEquals(expected, actual);
     }
 

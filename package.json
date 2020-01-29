@@ -9,14 +9,23 @@
   "scripts": {
     "build": "webpack --bail"
   },
+  "proxy": "http://localhost:5000",
   "keywords": [
     "graylog"
   ],
   "author": "Airbus CyberSecurity",
   "license": "GPL-3.0",
-  "dependencies": {},
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1",
+    "react-router-dom": "^5.1.2",
+    "webpack-node-externals": "^1.7.2"
+  },
   "devDependencies": {
-    "graylog-web-plugin": "file:../graylog2-server/graylog2-web-interface/packages/graylog-web-plugin"
+    "graylog-web-plugin": "file:../graylog2-server/graylog2-web-interface/packages/graylog-web-plugin",
+    "ldapjs": "^1.0.2",
+    "net": "^1.0.2",
+    "tls": "^0.0.1"
   },
   "resolutions": {
     "upath": "1.1.2"

@@ -33,8 +33,8 @@ public class LDAP extends AbstractFunction<String> {
 	public static final String NAME = "LDAP";
 	private static final String QUERY = "query";
 
-	private ClusterConfigService clusterConfig;
-	private LDAPSearch search = new LDAPSearch();
+	private final ClusterConfigService clusterConfig;
+	private LDAPSearch search;
 
 	private CacheManager cacheManager;
 
@@ -51,6 +51,7 @@ public class LDAP extends AbstractFunction<String> {
 
 	@Inject
 	public LDAP(final ClusterConfigService clusterConfigService) {
+		this.search = new LDAPSearch();
 		clusterConfig = clusterConfigService;
 		LDAPPluginConfiguration conf = clusterConfig.getOrDefault(LDAPPluginConfiguration.class,
 				LDAPPluginConfiguration.createDefault());
@@ -64,11 +65,7 @@ public class LDAP extends AbstractFunction<String> {
 				.build(true);
 	}
 
-	@Override
-	public String evaluate(FunctionArgs functionArgs, EvaluationContext evaluationContext) {
-		String query = queryParam.required(functionArgs, evaluationContext);
-		String responseStr = "";
-		Map<String, String> response = new HashMap<>();
+	private String evaluateBody(String query) {
 		Cache<String, String> myCache = cacheManager.getCache("myCache", String.class, String.class);
 
 		LDAPPluginConfiguration config = clusterConfig.get(LDAPPluginConfiguration.class);
@@ -80,41 +77,44 @@ public class LDAP extends AbstractFunction<String> {
 		if (myCache.containsKey(query)) {
 			log.info("LDAP: query {} is into cache with response {}", query, myCache.get(query));
 			return myCache.get(query);
-		} else {
-			log.info("LDAP: LDAP URL is {} with base {}, user {} and password ****", config.ldapUrl(), config.dc(),
-					config.user());
-			search.setLdapUrl(config.ldapUrl());
-			search.setDc(config.dc());
-			search.setUser(config.user());
-			search.setPassword(config.password());
-			log.info("LDAP: Searching with query param: {}", query);
-			try {
-				response = search.getSearch(query);
-				log.info("LDAP response: {}", response);
-				if (response.isEmpty()) {
-					log.warn("LDAP: no result");
-					return "LDAP=noResult";
-				}
-				responseStr = mapToString(response);
-				myCache.put(query, responseStr);
-			} catch (Exception e) {
-				log.error("An error occurred while LDAP search", e);
+		}
+		log.info("LDAP: LDAP URL is {} with base {}, user {} and password ****", config.ldapUrl(), config.dc(),
+				config.user());
+		search.setLdapUrl(config.ldapUrl());
+		search.setDc(config.dc());
+		search.setUser(config.user());
+		search.setPassword(config.password());
+		log.info("LDAP: Searching with query param: {}", query);
+		try {
+			Map<String, String> response = search.getSearch(query);
+			log.info("LDAP response: {}", response);
+			if (response.isEmpty()) {
+				log.warn("LDAP: no result");
+				return "LDAP=noResult";
 			}
-			finally {
-				return responseStr;
-			}
+			String responseStr = mapToString(response);
+			myCache.put(query, responseStr);
+			return responseStr;
+		} catch (Exception e) {
+			log.error("An error occurred while LDAP search", e);
+			return "LDAP=failed";
 		}
 	}
 
+	@Override
+	public String evaluate(FunctionArgs functionArgs, EvaluationContext evaluationContext) {
+		String query = queryParam.required(functionArgs, evaluationContext);
+		return evaluateBody(query);
+	}
+
 	public String mapToString(Map<String, String> map) {
-		String result;
-		StringBuilder bld = new StringBuilder();
+		StringBuilder builder = new StringBuilder();
 
 		// Put the Map into a key=value String
 		for (Entry<String, String> entry : map.entrySet()) {
-			bld.append(entry.getKey() + "=" + entry.getValue().replace(" ", "-") + " ");
+			builder.append(entry.getKey() + "=" + entry.getValue().replace(" ", "-") + " ");
 		}
-		result = bld.toString();
+		String result = builder.toString();
 		result = result.substring(0, result.length() - 1).replace("\"", "");
 		log.info("LDAP: Result {}", result);
 		return result;

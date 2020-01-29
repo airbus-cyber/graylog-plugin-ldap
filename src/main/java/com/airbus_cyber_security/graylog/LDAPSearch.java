@@ -27,15 +27,6 @@ public class LDAPSearch {
 	public LDAPSearch() {
 		super();
 	}
-	
-	public LDAPSearch(String ldapUrl, String dc, String user, String password, String filter) {
-		super();
-		this.ldapUrl = ldapUrl;
-		this.dc = dc;
-		this.user = user;
-		this.password = password;
-		this.filter = filter;
-	}
 
 	public String getFilter() {
 		return filter;
@@ -43,10 +34,6 @@ public class LDAPSearch {
 
 	public void setFilter(String filter) {
 		this.filter = filter;
-	}
-
-	public String getLdapUrl() {
-		return ldapUrl;
 	}
 
 	public void setLdapUrl(String ldapUrl) {
@@ -83,7 +70,7 @@ public class LDAPSearch {
 	 * @return a map of LDAP attribute-attribute value
 	 * @throws Exception
 	 */
-	public Map<String, String> getSearch(String query) throws Exception {
+	Map<String, String> getSearch(String query) throws Exception {
 		Map<String, String> searchResult = new HashMap<>();
 		try {
 			DirContext context = new InitialDirContext(LDAPUtils.getEnv(this.ldapUrl, this.user, this.password));
