@@ -30,6 +30,8 @@ public class LDAPTest {
     private ClusterConfigService clusterConfig;
     CacheManager cacheManager;
     ParameterDescriptor<String, String> queryParam;
+    ParameterDescriptor<String, String> typeParam;
+    ParameterDescriptor<String, String> filterParam;
     FunctionArgs functionArgs;
     EvaluationContext evaluationContext;
     LDAPPluginConfigurationTest config;
@@ -38,6 +40,8 @@ public class LDAPTest {
     public void setUp() throws Exception {
         clusterConfig = mock(ClusterConfigService.class);
         queryParam = mock(ParameterDescriptor.class);
+        typeParam = mock(ParameterDescriptor.class);
+        filterParam = mock(ParameterDescriptor.class);
 
         search = mock(LDAPSearch.class);
 
@@ -46,7 +50,7 @@ public class LDAPTest {
                         .newCacheConfigurationBuilder(String.class, String.class, ResourcePoolsBuilder.heap(100))
                         .withExpiry(ExpiryPolicyBuilder.timeToLiveExpiration(Duration.ofSeconds(60))))
                 .build(true);
-        plugin = new LDAP(clusterConfig, search, cacheManager, queryParam);
+        plugin = new LDAP(clusterConfig, search, cacheManager, queryParam, typeParam, filterParam);
         functionArgs = mock(FunctionArgs.class);
         evaluationContext = mock(EvaluationContext.class);
         config = new LDAPPluginConfigurationTest("ldap://ldap.fake.com", "dc=fake,dc=com",
@@ -60,6 +64,8 @@ public class LDAPTest {
     @Test
     public void evaluateNominalCase() throws Exception {
         String responseQuery = "(&(objectClass=inetOrgPerson)(uid=mock))";
+        String responseType = "";
+        String responseFilter = "";
         Map<String, String> response = new HashMap<>();
         response.put("uid", "mock");
         response.put("givenName", "Mock");
@@ -68,7 +74,10 @@ public class LDAPTest {
         when(clusterConfig.get(LDAPPluginConfiguration.class)).thenReturn(config);
 
         when(queryParam.required(functionArgs, evaluationContext)).thenReturn(responseQuery);
-        when(search.getSearch(responseQuery)).thenReturn(response);
+        when(typeParam.required(functionArgs, evaluationContext)).thenReturn(responseType);
+        when(filterParam.required(functionArgs, evaluationContext)).thenReturn(responseFilter);
+
+        when(search.getSearch(responseQuery, responseType, responseFilter)).thenReturn(response);
         String actual = plugin.evaluate(functionArgs, evaluationContext);
         String expected = "uid=mock givenName=Mock sn=Fake cn=Mock-Fake";
         assertEquals(expected, actual);
@@ -77,6 +86,8 @@ public class LDAPTest {
     @Test
     public void evaluateCacheCase() throws Exception {
         String responseQuery = "(&(objectClass=inetOrgPerson)(uid=mock))";
+        String responseType = "";
+        String responseFilter = "";
         String expected = "givenName=Mock uid=mock sn=Fake cn=Mock-Fake";
         String inCache = "givenName=Mock uid=mock sn=Fake cn=Mock-Fake";
         when(clusterConfig.get(LDAPPluginConfiguration.class)).thenReturn(config);
@@ -85,6 +96,9 @@ public class LDAPTest {
         myCache.put(responseQuery, inCache);
 
         when(queryParam.required(functionArgs, evaluationContext)).thenReturn(responseQuery);
+        when(typeParam.required(functionArgs, evaluationContext)).thenReturn(responseType);
+        when(filterParam.required(functionArgs, evaluationContext)).thenReturn(responseFilter);
+
         String actual = plugin.evaluate(functionArgs, evaluationContext);
         assertEquals(expected, actual);
     }
@@ -92,11 +106,16 @@ public class LDAPTest {
     @Test
     public void evaluateNoResultCase() throws Exception {
         String responseQuery = "(&(objectClass=inetOrgPerson)(uid=mock))";
+        String responseType = "";
+        String responseFilter = "";
         Map<String, String> response = new HashMap<>();
         when(clusterConfig.get(LDAPPluginConfiguration.class)).thenReturn(config);
 
         when(queryParam.required(functionArgs, evaluationContext)).thenReturn(responseQuery);
-        when(search.getSearch(responseQuery)).thenReturn(response);
+        when(typeParam.required(functionArgs, evaluationContext)).thenReturn(responseType);
+        when(filterParam.required(functionArgs, evaluationContext)).thenReturn(responseFilter);
+
+        when(search.getSearch(responseQuery, responseType, responseFilter)).thenReturn(response);
         String actual = plugin.evaluate(functionArgs, evaluationContext);
         String expected = "LDAP=noResult";
         assertEquals(expected, actual);
@@ -105,8 +124,13 @@ public class LDAPTest {
     @Test
     public void evaluateNoConfigCase() throws Exception {
         String responseQuery = "(&(objectClass=inetOrgPerson)(uid=mock))";
+        String responseType = "";
+        String responseFilter = "";
         String expected = "LDAP=noConfig";
         when(queryParam.required(functionArgs, evaluationContext)).thenReturn(responseQuery);
+        when(typeParam.required(functionArgs, evaluationContext)).thenReturn(responseType);
+        when(filterParam.required(functionArgs, evaluationContext)).thenReturn(responseFilter);
+
         String actual = plugin.evaluate(functionArgs, evaluationContext);
         assertEquals(expected, actual);
     }

@@ -4,14 +4,10 @@
  */
 package com.airbus_cyber_security.graylog;
 
-import javax.naming.Context;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.directory.*;
-import javax.naming.ldap.InitialLdapContext;
-import javax.naming.ldap.LdapContext;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Map;
 
 public class LDAPSearch {
@@ -70,11 +66,15 @@ public class LDAPSearch {
 	 * @return a map of LDAP attribute-attribute value
 	 * @throws Exception
 	 */
-	Map<String, String> getSearch(String query) throws Exception {
+	Map<String, String> getSearch(String query, String type, String filter) throws Exception {
 		Map<String, String> searchResult = new HashMap<>();
 		try {
 			DirContext context = new InitialDirContext(LDAPUtils.getEnv(this.ldapUrl, this.user, this.password));
 			SearchControls searchControls = new SearchControls();
+			if(filter != null && !filter.isEmpty()) {
+				String[] filterAttributes = filter.split(",");
+				searchControls.setReturningAttributes(filterAttributes);
+			}
 			searchControls.setSearchScope(SearchControls.SUBTREE_SCOPE);
 			NamingEnumeration<SearchResult> results = context.search(this.dc, query, searchControls);
 			if (results.hasMore()) {

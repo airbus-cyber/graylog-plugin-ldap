@@ -187,10 +187,9 @@ const LDAPPluginConfiguration = createReactClass({
 						<Input
 							id="dc"
 							type="text"
-							label="LDAP baseDN"
+							label="LDAP DC"
 							help={
-								<span>Note that this will be stored in plaintext. Please consult the documentation for
-									suggested rights to assign to the underlying IAM user.</span>
+								<span>LDAP base (ex.: dc=example,dc=com).</span>
 							}
 							name="dc"
 							value={this.state.config.dc}
@@ -202,8 +201,7 @@ const LDAPPluginConfiguration = createReactClass({
 							type="text"
 							label="LDAP bind user"
 							help={
-								<span>Note that this will be stored in plaintext. Please consult the documentation for
-									suggested rights to assign to the underlying IAM user.</span>
+								<span>User DN (ex.: cn=user,dc=example,dc=com).</span>
 							}
 							name="user"
 							value={this.state.config.user}
