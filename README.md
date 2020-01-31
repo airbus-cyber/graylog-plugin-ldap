@@ -32,7 +32,7 @@ rule "LDAP"
 when
   has_field("user")
 then
-  let result_str = LDAP(to_string($message.source));
+  let result_str = LDAP(to_string($message.source), to_string($message.user), "");
   let result = key_value(result_str);
   set_fields(result, "LDAP-");
 end
