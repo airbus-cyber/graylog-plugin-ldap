@@ -110,7 +110,7 @@ const LDAPPluginConfiguration = createReactClass({
 				<h3>LDAP Plugin Configuration</h3>
 
 				<p>
-					Base configuration LDAP plugin (URI, baseDN, bind user and bind password).
+					Base configuration LDAP plugin (URL, baseDC, bind user and bind password).
 					Note that some parameters will be stored in MongoDB without encryption.
 					Graylog users with required permissions will be able to read them in the
 					configuration dialog on this page.
@@ -124,7 +124,7 @@ const LDAPPluginConfiguration = createReactClass({
 							: '[not set]'}
 					</dd>
 
-					<dt>BaseDN:</dt>
+					<dt>BaseDC:</dt>
 					<dd>
 						{this.state.config.dc
 							? this.state.config.dc
@@ -187,7 +187,7 @@ const LDAPPluginConfiguration = createReactClass({
 						<Input
 							id="dc"
 							type="text"
-							label="LDAP DC"
+							label="LDAP DC Base"
 							help={
 								<span>LDAP base (ex.: dc=example,dc=com).</span>
 							}
@@ -235,7 +235,7 @@ const LDAPPluginConfiguration = createReactClass({
 						/>
 
 						<Input
-							id="ttl"q
+							id="ttl"
 							type="number"
 							min="0"
 							label="Cache TTL (seconds)"
@@ -247,6 +247,7 @@ const LDAPPluginConfiguration = createReactClass({
 							onChange={this._onUpdate('ttl')}
 						/>
 
+						<Button bsStyle="info" bsSize="s" onClick={this._test_connection}>Test</Button>
 					</fieldset>
 				</BootstrapModalForm>
 			</div>

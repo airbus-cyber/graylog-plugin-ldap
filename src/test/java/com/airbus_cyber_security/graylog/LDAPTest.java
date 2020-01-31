@@ -13,8 +13,11 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
+import javax.naming.NamingException;
+import javax.naming.directory.*;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
@@ -123,8 +126,8 @@ public class LDAPTest {
 
     @Test
     public void evaluateNoConfigCase() throws Exception {
-        String responseQuery = "(&(objectClass=inetOrgPerson)(uid=mock))";
-        String responseType = "";
+        String responseQuery = "(&(objectClass=inetOrgPerson))";
+        String responseType = "uid=jdoe1";
         String responseFilter = "";
         String expected = "LDAP=noConfig";
         when(queryParam.required(functionArgs, evaluationContext)).thenReturn(responseQuery);
@@ -134,4 +137,5 @@ public class LDAPTest {
         String actual = plugin.evaluate(functionArgs, evaluationContext);
         assertEquals(expected, actual);
     }
+
 }

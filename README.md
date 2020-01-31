@@ -37,7 +37,17 @@ then
   set_fields(result, "LDAP-");
 end
 ```
-
+If you want to do the same search but displaying only the sn and givenName fields, create a pipeline function like:
+```
+rule "LDAP"
+when
+  has_field("user")
+then
+  let result_str = LDAP(to_string($message.source), to_string($message.user), "sn,givenName");
+  let result = key_value(result_str);
+  set_fields(result, "LDAP-");
+end
+```
 ## Build
 
 This project is using Maven 3 and requires Java 8 or higher.

@@ -4,6 +4,9 @@
  */
 package com.airbus_cyber_security.graylog;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.directory.*;
@@ -16,20 +19,13 @@ public class LDAPSearch {
 	private String dc;
 	private String user;
 	private String password;
-	private String filter;
+
+	Logger LOG = LoggerFactory.getLogger(LDAPSearch.class);
 
 	private static final String USER_PASSWORD_ATTRIBUTE_ID = "userPassword";
 
 	public LDAPSearch() {
 		super();
-	}
-
-	public String getFilter() {
-		return filter;
-	}
-
-	public void setFilter(String filter) {
-		this.filter = filter;
 	}
 
 	public void setLdapUrl(String ldapUrl) {
@@ -67,6 +63,7 @@ public class LDAPSearch {
 	 * @throws Exception
 	 */
 	Map<String, String> getSearch(String query, String type, String filter) throws Exception {
+		LOG.info("LDAP : search with query {}, type : {} and returned attributes : {}", query, type, filter);
 		Map<String, String> searchResult = new HashMap<>();
 		try {
 			DirContext context = new InitialDirContext(LDAPUtils.getEnv(this.ldapUrl, this.user, this.password));
@@ -76,7 +73,9 @@ public class LDAPSearch {
 				searchControls.setReturningAttributes(filterAttributes);
 			}
 			searchControls.setSearchScope(SearchControls.SUBTREE_SCOPE);
-			NamingEnumeration<SearchResult> results = context.search(this.dc, query, searchControls);
+			String searchQuery = "(&" + query + "(" + type + "))";
+			LOG.info("searchQuery {}", searchQuery);
+			NamingEnumeration<SearchResult> results = context.search(this.dc, searchQuery, searchControls);
 			if (results.hasMore()) {
 				SearchResult result = results.next();
 				Attributes attributes = result.getAttributes();
