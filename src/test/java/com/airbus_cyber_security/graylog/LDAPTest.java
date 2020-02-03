@@ -13,11 +13,8 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
-import javax.naming.NamingException;
-import javax.naming.directory.*;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
@@ -66,8 +63,8 @@ public class LDAPTest {
 
     @Test
     public void evaluateNominalCase() throws Exception {
-        String responseQuery = "(&(objectClass=inetOrgPerson)(uid=mock))";
-        String responseType = "";
+        String responseQuery = "mock";
+        String responseType = "uid";
         String responseFilter = "";
         Map<String, String> response = new HashMap<>();
         response.put("uid", "mock");
@@ -88,8 +85,8 @@ public class LDAPTest {
 
     @Test
     public void evaluateCacheCase() throws Exception {
-        String responseQuery = "(&(objectClass=inetOrgPerson)(uid=mock))";
-        String responseType = "";
+        String responseQuery = "mock";
+        String responseType = "uid";
         String responseFilter = "";
         String expected = "givenName=Mock uid=mock sn=Fake cn=Mock-Fake";
         String inCache = "givenName=Mock uid=mock sn=Fake cn=Mock-Fake";
@@ -108,8 +105,8 @@ public class LDAPTest {
 
     @Test
     public void evaluateNoResultCase() throws Exception {
-        String responseQuery = "(&(objectClass=inetOrgPerson)(uid=mock))";
-        String responseType = "";
+        String responseQuery = "mock";
+        String responseType = "uid";
         String responseFilter = "";
         Map<String, String> response = new HashMap<>();
         when(clusterConfig.get(LDAPPluginConfiguration.class)).thenReturn(config);
@@ -126,8 +123,8 @@ public class LDAPTest {
 
     @Test
     public void evaluateNoConfigCase() throws Exception {
-        String responseQuery = "(&(objectClass=inetOrgPerson))";
-        String responseType = "uid=jdoe1";
+        String responseQuery = "mock";
+        String responseType = "uid";
         String responseFilter = "";
         String expected = "LDAP=noConfig";
         when(queryParam.required(functionArgs, evaluationContext)).thenReturn(responseQuery);

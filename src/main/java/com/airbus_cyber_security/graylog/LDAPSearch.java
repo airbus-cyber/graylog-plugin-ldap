@@ -58,12 +58,14 @@ public class LDAPSearch {
 
 	/**
 	 * Returns the result of the query on LDAP
-	 * @param query
+	 * @param value the value to search
+	 * @param type type of the attribute of the value
+	 * @param filter attributes to return (comma-separated), if empty, all attributes are return
 	 * @return a map of LDAP attribute-attribute value
 	 * @throws Exception
 	 */
-	Map<String, String> getSearch(String query, String type, String filter) throws Exception {
-		LOG.info("LDAP : search with query {}, type : {} and returned attributes : {}", query, type, filter);
+	Map<String, String> getSearch(String value, String type, String filter) throws Exception {
+		LOG.info("LDAP : search with query {}, type : {} and returned attributes : {}", value, type, filter);
 		Map<String, String> searchResult = new HashMap<>();
 		try {
 			DirContext context = new InitialDirContext(LDAPUtils.getEnv(this.ldapUrl, this.user, this.password));
@@ -73,7 +75,7 @@ public class LDAPSearch {
 				searchControls.setReturningAttributes(filterAttributes);
 			}
 			searchControls.setSearchScope(SearchControls.SUBTREE_SCOPE);
-			String searchQuery = "(&" + query + "(" + type + "))";
+			String searchQuery = "(" + type + "=" + value + ")";
 			LOG.info("searchQuery {}", searchQuery);
 			NamingEnumeration<SearchResult> results = context.search(this.dc, searchQuery, searchControls);
 			if (results.hasMore()) {

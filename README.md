@@ -26,13 +26,13 @@ In the configuration tab of Graylog, you will have to provide:
 
 ## Usage
 
-To search into the Computer category for the source field and display all fields, create a pipeline function like:
+To search with an attribute and display all fields, create a pipeline function like:
 ```
 rule "LDAP"
 when
-  has_field("user")
+  has_field("user_id")
 then
-  let result_str = LDAP(to_string($message.source), to_string($message.user), "");
+  let result_str = LDAP(to_string($message.user_id), "uid", "");
   let result = key_value(result_str);
   set_fields(result, "LDAP-");
 end
@@ -41,9 +41,9 @@ If you want to do the same search but displaying only the sn and givenName field
 ```
 rule "LDAP"
 when
-  has_field("user")
+  has_field("user_id")
 then
-  let result_str = LDAP(to_string($message.source), to_string($message.user), "sn,givenName");
+  let result_str = LDAP(to_string($message.user_id), "uid", "sn,givenName");
   let result = key_value(result_str);
   set_fields(result, "LDAP-");
 end
