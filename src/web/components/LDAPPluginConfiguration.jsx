@@ -10,7 +10,6 @@ import { BootstrapModalForm, Input } from 'components/bootstrap';
 import { IfPermitted } from 'components/common';
 import ObjectUtils from 'util/ObjectUtils';
 import UserNotification from 'util/UserNotification';
-import Bind from './Bind';
 
 const LDAPPluginConfiguration = createReactClass({
 	displayName: 'LDAPPluginConfiguration',
@@ -84,24 +83,6 @@ const LDAPPluginConfiguration = createReactClass({
 		this.props.updateConfig(this.state.config).then(() => {
 			this._closeModal();
 		});
-	},
-
-	_test_connection() {
-		fetch('/ldapAuth/?ldap_url=' + this.state.config.ldap_url +
-            '&user=' + this.state.config.user + '&password=' + this.state.config.password)
-            .then((res) => {
-            if (res.ok) {
-                UserNotification.success("Connection to "
-                    + this.state.config.ldap_url + " with user "
-                    + this.state.config.user + " succeeded !");
-            } else {
-                UserNotification.error("Impossible to connect to "
-                    + this.state.config.ldap_url + " with user "
-                    + this.state.config.user + " Failed to connect");
-            }
-
-        }).then(data => { console.log(data) });
-
 	},
 
 	render() {
@@ -246,8 +227,6 @@ const LDAPPluginConfiguration = createReactClass({
 							value={this.state.config.ttl}
 							onChange={this._onUpdate('ttl')}
 						/>
-
-						<Button bsStyle="info" bsSize="s" onClick={this._test_connection}>Test</Button>
 					</fieldset>
 				</BootstrapModalForm>
 			</div>
