@@ -229,7 +229,7 @@
 							</mapper>
 						</data>
 					</dataSet>
-					<signPackage>true</signPackage>
+					<signPackage>false</signPackage>
 					<signMethod>dpkg-sig</signMethod>
 					<signRole>builder</signRole>
 				</configuration>
