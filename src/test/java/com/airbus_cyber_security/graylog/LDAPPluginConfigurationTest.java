@@ -12,6 +12,8 @@ public class LDAPPluginConfigurationTest extends LDAPPluginConfiguration {
 
     private String password;
 
+    private int timeout;
+
     public String getLdapUrl() {
         return ldapUrl;
     }
@@ -38,6 +40,14 @@ public class LDAPPluginConfigurationTest extends LDAPPluginConfiguration {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public int getTimeout() {
+        return timeout;
+    }
+
+    public void setTimeout(int timeout) {
+        this.timeout = timeout;
     }
 
     @Override
@@ -69,15 +79,21 @@ public class LDAPPluginConfigurationTest extends LDAPPluginConfiguration {
     }
 
     @Override
+    public int timeout() {
+        return 500;
+    }
+
+    @Override
     public Builder toBuilder() {
         return null;
     }
 
-    public LDAPPluginConfigurationTest(String ldapUrl, String dc, String user, String password){
+    public LDAPPluginConfigurationTest(String ldapUrl, String dc, String user, String password, int timeout){
         super();
         this.ldapUrl = ldapUrl;
         this.dc = dc;
         this.user = user;
         this.password = password;
+        this.timeout = timeout;
     }
 }

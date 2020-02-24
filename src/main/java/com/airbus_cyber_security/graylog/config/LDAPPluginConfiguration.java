@@ -30,21 +30,25 @@ public abstract class LDAPPluginConfiguration {
 	@JsonProperty("ttl")
 	public abstract int ttl();
 
+	@JsonProperty("timeout")
+	public abstract int timeout();
+
 	@JsonCreator
 	public static LDAPPluginConfiguration create(@JsonProperty("ldap_url") String ldapUrl,
 		 	@JsonProperty("dc") String dc, @JsonProperty("user") String user,
 		 	@JsonProperty("password") String password, @JsonProperty("heap_size") int heapSize,
-		 	@JsonProperty("ttl") int ttl) {
+		 	@JsonProperty("ttl") int ttl, @JsonProperty("timeout") int timeout) {
 		if (heapSize <= 0)
 			heapSize = 100;
 		if (ttl <= 0) {
 			ttl = 60;
 		}
-		return builder().ldapUrl(ldapUrl).dc(dc).user(user).password(password).heapSize(heapSize).ttl(ttl).build();
+		return builder().ldapUrl(ldapUrl).dc(dc).user(user).password(password).heapSize(heapSize).ttl(ttl)
+				.timeout(timeout).build();
 	}
 
 	public static LDAPPluginConfiguration createDefault() {
-		return builder().ldapUrl("").dc("").user("").password("").heapSize(100).ttl(60).build();
+		return builder().ldapUrl("").dc("").user("").password("").heapSize(100).ttl(60).timeout(0).build();
 	}
 
 	public static Builder builder() {
@@ -66,6 +70,8 @@ public abstract class LDAPPluginConfiguration {
 		public abstract Builder heapSize(int heapSize);
 
 		public abstract Builder ttl(int ttl);
+
+		public abstract Builder timeout(int timeout);
 
 		public abstract LDAPPluginConfiguration build();
 	}

@@ -22,12 +22,13 @@ const LDAPPluginConfiguration = createReactClass({
 	getDefaultProps() {
 		return {
 			config: {
-				ldap_url: 'ldap://127.0.0.1',
+				ldap_url: 'ldap://127.0.0.1:389',
 				dc: 'dc=airbus,dc=com',
 				user: 'cn=admin,dc=airbus,dc=com',
 				password: 'admin',
 				heap_size: 100,
 				ttl: 60,
+				timeout: 500,
 			},
 		};
 	},
@@ -85,6 +86,24 @@ const LDAPPluginConfiguration = createReactClass({
 		});
 	},
 
+	_test_connection() {
+		fetch('/ldapAuth/?ldap_url=' + this.state.config.ldap_url +
+			'&user=' + this.state.config.user + '&password=' + this.state.config.password)
+			.then((res) => {
+				if (res.ok) {
+					UserNotification.success("Connection to "
+						+ this.state.config.ldap_url + " with user "
+						+ this.state.config.user + " succeeded !");
+				} else {
+					UserNotification.error("Impossible to connect to "
+						+ this.state.config.ldap_url + " with user "
+						+ this.state.config.user + " Failed to connect");
+				}
+
+			}).then(data => { console.log(data) });
+
+	},
+
 	render() {
 		return (
 			<div>
@@ -137,6 +156,13 @@ const LDAPPluginConfiguration = createReactClass({
 					<dd>
 						{this.state.config.ttl
 							? this.state.config.ttl
+							: '[not set]'}
+					</dd>
+
+					<dt>Timeout:</dt>
+					<dd>
+						{this.state.config.timeout
+							? this.state.config.timeout
 							: '[not set]'}
 					</dd>
 				</dl>
@@ -227,6 +253,21 @@ const LDAPPluginConfiguration = createReactClass({
 							value={this.state.config.ttl}
 							onChange={this._onUpdate('ttl')}
 						/>
+
+						<Input
+							id="timeout"
+							type="number"
+							min="0"
+							label="Timeout (milliseconds)"
+							help={
+								<span>Timeout in milliseconds</span>
+							}
+							name="timeout"
+							value={this.state.config.timeout}
+							onChange={this._onUpdate('timeout')}
+						/>
+
+						<Button bsStyle="info" bsSize="s" onClick={this._test_connection}>Test</Button>
 					</fieldset>
 				</BootstrapModalForm>
 			</div>

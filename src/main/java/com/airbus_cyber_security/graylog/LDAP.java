@@ -94,6 +94,7 @@ public class LDAP extends AbstractFunction<String> {
 		search.setDc(config.dc());
 		search.setUser(config.user());
 		search.setPassword(config.password());
+		search.setTimeout(config.timeout());
 		log.info("LDAP: Searching with query param: {}, type param: {} and filter param: {}", query, type, filter);
 		try {
 			Map<String, String> response = search.getSearch(query, type, filter);

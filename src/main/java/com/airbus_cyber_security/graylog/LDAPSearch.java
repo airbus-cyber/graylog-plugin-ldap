@@ -19,6 +19,7 @@ public class LDAPSearch {
 	private String dc;
 	private String user;
 	private String password;
+	private int timeout;
 
 	Logger LOG = LoggerFactory.getLogger(LDAPSearch.class);
 
@@ -56,6 +57,15 @@ public class LDAPSearch {
 		this.password = password;
 	}
 
+	public int getTimeout() {
+		return timeout;
+	}
+
+	public void setTimeout(int timeout) {
+		this.timeout = timeout;
+	}
+
+
 	/**
 	 * Returns the result of the query on LDAP
 	 * @param value the value to search
@@ -68,7 +78,7 @@ public class LDAPSearch {
 		LOG.info("LDAP : search with query {}, type : {} and returned attributes : {}", value, type, filter);
 		Map<String, String> searchResult = new HashMap<>();
 		try {
-			DirContext context = new InitialDirContext(LDAPUtils.getEnv(this.ldapUrl, this.user, this.password));
+			DirContext context = new InitialDirContext(LDAPUtils.getEnv(this.ldapUrl, this.user, this.password, this.timeout));
 			SearchControls searchControls = new SearchControls();
 			if(filter != null && !filter.isEmpty()) {
 				String[] filterAttributes = filter.split(",");

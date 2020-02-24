@@ -54,7 +54,7 @@ public class LDAPTest {
         functionArgs = mock(FunctionArgs.class);
         evaluationContext = mock(EvaluationContext.class);
         config = new LDAPPluginConfigurationTest("ldap://ldap.fake.com", "dc=fake,dc=com",
-                "cn=mock,dc=fake,dc=com", "fake");
+                "cn=mock,dc=fake,dc=com", "fake", 500);
     }
 
     @After
