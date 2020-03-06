@@ -23,6 +23,7 @@
   },
   "devDependencies": {
     "graylog-web-plugin": "file:../graylog2-server/graylog2-web-interface/packages/graylog-web-plugin",
+    "reflux": "^6.4.1",
     "ldapjs": "^1.0.2",
     "net": "^1.0.2",
     "tls": "^0.0.1"

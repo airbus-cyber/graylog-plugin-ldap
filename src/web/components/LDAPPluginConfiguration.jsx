@@ -4,15 +4,22 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
+import Reflux from "reflux";
 import createReactClass from 'create-react-class';
 import { Button } from 'react-bootstrap';
 import { BootstrapModalForm, Input } from 'components/bootstrap';
 import { IfPermitted } from 'components/common';
 import ObjectUtils from 'util/ObjectUtils';
-import UserNotification from 'util/UserNotification';
+import LDAPConfigurationsActions from '../config/LDAPConfigurationsActions';
+import LDAPConfigurationStore from "../config/LDAPConfigurationsStore";
+import StoreProvider from 'injection/StoreProvider';
+
+const NodesStore = StoreProvider.getStore('Nodes');
 
 const LDAPPluginConfiguration = createReactClass({
 	displayName: 'LDAPPluginConfiguration',
+
+	mixins: [Reflux.connect(LDAPConfigurationStore), Reflux.connect(NodesStore, 'nodes')],
 
 	propTypes: {
 		config: PropTypes.object,
@@ -87,21 +94,7 @@ const LDAPPluginConfiguration = createReactClass({
 	},
 
 	_test_connection() {
-		fetch('/ldapAuth/?ldap_url=' + this.state.config.ldap_url +
-			'&user=' + this.state.config.user + '&password=' + this.state.config.password)
-			.then((res) => {
-				if (res.ok) {
-					UserNotification.success("Connection to "
-						+ this.state.config.ldap_url + " with user "
-						+ this.state.config.user + " succeeded !");
-				} else {
-					UserNotification.error("Impossible to connect to "
-						+ this.state.config.ldap_url + " with user "
-						+ this.state.config.user + " Failed to connect");
-				}
-
-			}).then(data => { console.log(data) });
-
+		LDAPConfigurationsActions.testConfig();
 	},
 
 	render() {

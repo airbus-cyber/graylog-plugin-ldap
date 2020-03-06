@@ -4,6 +4,7 @@
  */
 package com.airbus_cyber_security.graylog;
 
+import com.airbus_cyber_security.graylog.config.rest.LDAPPluginConfigurationResource;
 import org.graylog2.plugin.PluginConfigBean;
 import org.graylog2.plugin.PluginModule;
 import java.util.Set;
@@ -28,6 +29,7 @@ public class LDAPModule extends PluginModule {
 	@Override
 	protected void configure() {
 		addMessageProcessorFunction(LDAP.NAME, LDAP.class);
+		addRestResource(LDAPPluginConfigurationResource.class);
 	}
 
 	protected void addMessageProcessorFunction(String name, Class<? extends Function<?>> functionClass) {

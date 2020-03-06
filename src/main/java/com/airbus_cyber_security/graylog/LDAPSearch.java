@@ -74,7 +74,7 @@ public class LDAPSearch {
 	 * @return a map of LDAP attribute-attribute value
 	 * @throws Exception
 	 */
-	Map<String, String> getSearch(String value, String type, String filter) throws Exception {
+	public Map<String, String> getSearch(String value, String type, String filter) throws Exception {
 		LOG.info("LDAP : search with query {}, type : {} and returned attributes : {}", value, type, filter);
 		Map<String, String> searchResult = new HashMap<>();
 		try {
@@ -102,7 +102,7 @@ public class LDAPSearch {
 			}
 			return searchResult;
 		} catch (NamingException e) {
-			throw new Exception(e);
+			throw new NamingException(e.getMessage());
 		}
 	}
 }
