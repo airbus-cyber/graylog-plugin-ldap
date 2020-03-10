@@ -94,7 +94,7 @@ const LDAPPluginConfiguration = createReactClass({
 	},
 
 	_test_connection() {
-		LDAPConfigurationsActions.testConfig();
+		LDAPConfigurationsActions.testConfig(this.state.config);
 	},
 
 	render() {

@@ -5,6 +5,7 @@ import com.airbus_cyber_security.graylog.config.LDAPPluginConfiguration;
 import com.codahale.metrics.annotation.Timed;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.plugin.cluster.ClusterConfigService;
@@ -20,10 +21,7 @@ import javax.naming.directory.DirContext;
 import javax.naming.directory.InitialDirContext;
 import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 
 import static java.util.Objects.requireNonNull;
@@ -48,12 +46,11 @@ public class LDAPPluginConfigurationResource extends RestResource implements Plu
         this.clusterConfigService = requireNonNull(clusterConfigService);
     }
 
-    @GET
+    @POST
     @Timed
     @ApiOperation(value = "Test ldap configuration")
     @RequiresPermissions({CLUSTER_CONFIG_ENTRY_READ})
-    public LDAPAuthResponse testConfig() {
-        LDAPPluginConfiguration config = clusterConfigService.getOrDefault(LDAPPluginConfiguration.class, LDAPPluginConfiguration.createDefault());
+    public LDAPAuthResponse testConfig(@ApiParam(name = "config", required = true) final LDAPPluginConfiguration config) {
         try {
             log.info("Config : ldapUrl {}, user {}", config.ldapUrl(), config.user());
             DirContext context = new InitialDirContext(LDAPUtils.getEnv(config.ldapUrl(), config.user(), config.password(), config.timeout()));
