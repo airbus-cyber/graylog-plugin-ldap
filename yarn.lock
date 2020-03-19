@@ -2596,7 +2596,7 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.15, graceful-fs@^4.1.2:
     "@babel/preset-env" "7.2.3"
     babel-eslint "9.0.0"
     eslint "4.19.1"
-    eslint-config-graylog "file:../../../.cache/yarn/v4/npm-graylog-web-plugin-3.0.3-SNAPSHOT-2d0dfcef-272d-454b-a600-501231dcdcb6-1580307068719/node_modules/eslint-config-graylog"
+    eslint-config-graylog "file:../../../.cache/yarn/v4/npm-graylog-web-plugin-3.0.3-SNAPSHOT-64f21ca4-6791-416e-ae08-d4f991248b3b-1583743984368/node_modules/eslint-config-graylog"
     html-webpack-plugin "3.2.0"
     javascript-natural-sort "0.7.1"
     jquery "3.3.1"
@@ -4636,6 +4636,13 @@ reflux-core@^0.2.1:
   dependencies:
     eventemitter3 "^1.1.1"
 
+reflux-core@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/reflux-core/-/reflux-core-1.0.0.tgz#eb9baae2d50871324adb9312583c12e070cd61d3"
+  integrity sha1-65uq4tUIcTJK25MSWDwS4HDNYdM=
+  dependencies:
+    eventemitter3 "^1.1.1"
+
 reflux@0.2.13:
   version "0.2.13"
   resolved "https://registry.yarnpkg.com/reflux/-/reflux-0.2.13.tgz#8d43a94ce790c94259ac27b9256f63fe97cf29f5"
@@ -4643,6 +4650,14 @@ reflux@0.2.13:
   dependencies:
     eventemitter3 "^1.1.1"
     reflux-core "^0.2.1"
+
+reflux@^6.4.1:
+  version "6.4.1"
+  resolved "https://registry.yarnpkg.com/reflux/-/reflux-6.4.1.tgz#8bbbabaff54cf1b82233d67dd2542fdad2a8d678"
+  integrity sha1-i7urr/VM8bgiM9Z90lQv2tKo1ng=
+  dependencies:
+    eventemitter3 "^1.1.1"
+    reflux-core "^1.0.0"
 
 regenerate-unicode-properties@^8.1.0:
   version "8.1.0"
