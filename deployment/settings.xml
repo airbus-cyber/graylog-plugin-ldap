@@ -19,7 +19,7 @@
 			<properties>
 				<gpg.executable>gpg2</gpg.executable>
 				<gpg.passphrase>${env.PASSPHRASE}</gpg.passphrase>
-				<gpg.keyname>Airbus CyberSecurity</gpg.keyname>
+				<gpg.keyname>CyberSecurity</gpg.keyname>
 			</properties>
 		</profile>
 		<profile>
