@@ -25,7 +25,7 @@
 		<profile>
 			<id>jdeb-signing</id>
 			<properties>
-				<jdeb.key>F8D87B13</jdeb.key>
+				<jdeb.key>E5784CDC</jdeb.key>
 				<jdeb.passphrase>${env.PASSPHRASE}</jdeb.passphrase>
 			</properties>
 		</profile>

@@ -23,8 +23,7 @@ install:
 script:
 - mvn package -Dmaven.javadoc.skip=true -Dsource.skip=true -Dgpg.skip -B
 after_success:
-- openssl aes-256-cbc -K $encrypted_9cc1e0b2c494_key -iv $encrypted_9cc1e0b2c494_iv
-  -in deployment/signingkey.asc.enc -out deployment/signingkey.asc -d
+- openssl aes-256-cbc -K $encrypted_ef914333f193_key -iv $encrypted_ef914333f193_iv -in signingkey.asc.enc -out signingkey.asc -d
 - gpg2 --import deployment/signingkey.asc
 - gpg2 --allow-secret-key-import --import deployment/signingkey.asc
 before_deploy:
@@ -49,5 +48,8 @@ deploy:
     jdk: openjdk8
     tags: true
 after_deploy:
-  - echo "Deploying release to Maven Central"
-  - mvn clean deploy -DskipTests=true --settings deployment/settings.xml
+- echo "Deploying release to Maven Central"
+- mvn clean deploy -DskipTests=true --settings deployment/settings.xml
+before_install:
+- openssl aes-256-cbc -K $encrypted_ef914333f193_key -iv $encrypted_ef914333f193_iv
+  -in signingkey.asc.enc -out signingkey.asc -d
