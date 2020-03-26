@@ -50,6 +50,3 @@ deploy:
 after_deploy:
 - echo "Deploying release to Maven Central"
 - mvn clean deploy -DskipTests=true --settings deployment/settings.xml
-before_install:
-- openssl aes-256-cbc -K $encrypted_ef914333f193_key -iv $encrypted_ef914333f193_iv
-  -in signingkey.asc.enc -out signingkey.asc -d
