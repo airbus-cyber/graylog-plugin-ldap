@@ -1,6 +1,6 @@
 {
   "name": "graylog-plugin-ldap",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Graylog plugins to integrate with LDAP",
   "repository": {
     "type": "git",
